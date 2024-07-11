@@ -261,6 +261,22 @@ HighsStatus highs_changeColsBounds(Highs* h, HighsInt num_set_entries,
                              upper_ptr);
 }
 
+HighsStatus highs_changeRowsBounds(Highs* h, HighsInt num_set_entries,
+                                   py::array_t<HighsInt> indices,
+                                   py::array_t<double> lower,
+                                   py::array_t<double> upper) {
+  py::buffer_info indices_info = indices.request();
+  py::buffer_info lower_info = lower.request();
+  py::buffer_info upper_info = upper.request();
+
+  HighsInt* indices_ptr = static_cast<HighsInt*>(indices_info.ptr);
+  double* lower_ptr = static_cast<double*>(lower_info.ptr);
+  double* upper_ptr = static_cast<double*>(upper_info.ptr);
+
+  return h->changeRowsBounds(num_set_entries, indices_ptr, lower_ptr,
+                             upper_ptr);
+}
+
 HighsStatus highs_changeColsIntegrality(Highs* h, HighsInt num_set_entries,
                                         py::array_t<HighsInt> indices,
                                         py::array_t<HighsVarType> integrality) {
@@ -931,6 +947,7 @@ PYBIND11_MODULE(_core, m) {
       .def("addVars", &highs_addVars)
       .def("changeColsCost", &highs_changeColsCost)
       .def("changeColsBounds", &highs_changeColsBounds)
+      .def("changeRowsBounds", &highs_changeRowsBounds)
       .def("changeColsIntegrality", &highs_changeColsIntegrality)
       .def("deleteCols", &highs_deleteCols)
       .def("deleteVars", &highs_deleteCols) // alias
